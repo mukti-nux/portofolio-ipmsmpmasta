@@ -11,7 +11,7 @@ const MemberSpotlight = () => {
       id: 1,
       name: "Holy Safura Nurin Hasana",
       position: "Ketua Organisasi periode 24/25",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face",
+      avatar: "https://github.com/mukti-nux/portof-asset/blob/main/0116430408.png?raw=true",
       achievement: "Meningkatkan partisipasi anggota sebesar 40% melalui inisiatif keterlibatan komunitas dan program pelatihan kepemimpinan",
       department: "Kepemimpinan",
       experience: "2 tahun",

@@ -22,7 +22,7 @@ const UserPathways = () => {
       ],
       ctaText: 'Mulai Jelajahi',
       route: '/organization-profile',
-      stats: { label: 'Pengunjung Bulanan', value: '2.5K+' }
+      stats: { label: 'Pengunjung Bulanan', value: '100+' }
     },
     {
       id: 'member',
@@ -35,11 +35,11 @@ const UserPathways = () => {
         'Dashboard personal anggota',
         'Akses dokumen dan arsip',
         'Sistem komunikasi internal',
-        'Tracking status keanggotaan'
+        'Status keanggotaan'
       ],
       ctaText: 'Masuk Portal',
       route: '/member-management-suite',
-      stats: { label: 'Anggota Aktif', value: '150+' }
+      stats: { label: 'Anggota Aktif', value: '24+' }
     },
     {
       id: 'admin',
@@ -56,7 +56,7 @@ const UserPathways = () => {
       ],
       ctaText: 'Buka Dashboard',
       route: '/admin-dashboard',
-      stats: { label: 'Admin Aktif', value: '12' }
+      stats: { label: 'Admin Aktif', value: '1' }
     }
   ];
 
