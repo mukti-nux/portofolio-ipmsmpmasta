@@ -44,31 +44,34 @@ const Header = ({ className = '' }) => {
   const Logo = () => (
     <div className="flex items-center space-x-3">
       <div className="w-10 h-10 bg-gradient-to-br from-brand-primary to-brand-secondary rounded-lg flex items-center justify-center">
-        <Icon name="Workflow" size={24} color="white" strokeWidth={2.5} />
+        <img
+          src="/favicon.ico"
+          alt="logoUtama"
+          className="w-7 h-7 object-contain"
+        />
       </div>
       <div className="flex flex-col">
         <span className="text-xl font-bold text-brand-primary tracking-tight">
-          OrganiFlow
+          PR IPM SMP MUHAMMADIYAH TEMPURAN
         </span>
         <span className="text-xs text-muted-foreground font-medium -mt-1">
-          Progressive Management
+          Morals in Motion, Kindness in Action
         </span>
       </div>
     </div>
   );
 
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-background/95 backdrop-blur-md border-b border-border shadow-brand' 
-          : 'bg-background/80 backdrop-blur-sm'
-      } ${className}`}
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+        ? 'bg-background/95 backdrop-blur-md border-b border-border shadow-brand'
+        : 'bg-background/80 backdrop-blur-sm'
+        } ${className}`}
     >
       <div className="container-brand">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div 
+          <div
             className="flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
             onClick={() => handleNavigation('/homepage')}
           >
@@ -81,11 +84,10 @@ const Header = ({ className = '' }) => {
               <button
                 key={item?.path}
                 onClick={() => handleNavigation(item?.path)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  isActivePath(item?.path)
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-foreground hover:bg-muted hover:text-foreground'
-                }`}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${isActivePath(item?.path)
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-foreground hover:bg-muted hover:text-foreground'
+                  }`}
               >
                 <Icon name={item?.icon} size={18} />
                 <span>{item?.name}</span>
@@ -98,7 +100,7 @@ const Header = ({ className = '' }) => {
                 <Icon name="MoreHorizontal" size={18} />
                 <span>More</span>
               </button>
-              
+
               {/* Dropdown */}
               <div className="absolute right-0 top-full mt-2 w-48 bg-popover border border-border rounded-lg shadow-brand-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="py-2">
@@ -106,11 +108,10 @@ const Header = ({ className = '' }) => {
                     <button
                       key={item?.path}
                       onClick={() => handleNavigation(item?.path)}
-                      className={`flex items-center space-x-3 w-full px-4 py-2 text-sm text-left transition-colors ${
-                        isActivePath(item?.path)
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-popover-foreground hover:bg-muted'
-                      }`}
+                      className={`flex items-center space-x-3 w-full px-4 py-2 text-sm text-left transition-colors ${isActivePath(item?.path)
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-popover-foreground hover:bg-muted'
+                        }`}
                     >
                       <Icon name={item?.icon} size={16} />
                       <span>{item?.name}</span>
@@ -149,17 +150,16 @@ const Header = ({ className = '' }) => {
                 <button
                   key={item?.path}
                   onClick={() => handleNavigation(item?.path)}
-                  className={`flex items-center space-x-3 w-full px-4 py-3 text-left rounded-lg transition-colors ${
-                    isActivePath(item?.path)
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-foreground hover:bg-muted'
-                  }`}
+                  className={`flex items-center space-x-3 w-full px-4 py-3 text-left rounded-lg transition-colors ${isActivePath(item?.path)
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-foreground hover:bg-muted'
+                    }`}
                 >
                   <Icon name={item?.icon} size={20} />
                   <span className="font-medium">{item?.name}</span>
                 </button>
               ))}
-              
+
               {/* Mobile User Actions */}
               <div className="pt-4 mt-4 border-t border-border space-y-1">
                 <button className="flex items-center space-x-3 w-full px-4 py-3 text-left text-foreground hover:bg-muted rounded-lg transition-colors">

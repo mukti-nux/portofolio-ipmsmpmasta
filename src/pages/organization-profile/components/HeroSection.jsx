@@ -22,27 +22,26 @@ const HeroSection = () => {
                 <span className="text-lg font-medium">Profil Organisasi</span>
               </div>
               <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
-                Membangun Masa Depan
-                <span className="block text-brand-accent">Bersama Inovasi</span>
+                Media pengenal dan Informasi resmi dengan
+                <span className="block text-brand-accent">Berbasis Elektronik</span>
               </h1>
               <p className="text-xl text-white/90 leading-relaxed max-w-lg">
-                OrganiFlow adalah organisasi progresif yang menggabungkan tradisi dengan inovasi, 
-                menciptakan solusi berkelanjutan untuk kemajuan masyarakat Indonesia.
+                PR IPM SMP Muhammadiyah Tempuran melangkah maju dengan semangat digitalisasi, menyediakan informasi terkini dan transparan tentang kegiatan serta program organisasi kami, dengan tetap berkomitmen untuk mengembangkan potensi diri, kepemimpinan, dan semangat kebersamaan di kalangan siswa. 
               </p>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-brand-accent">15+</div>
+                <div className="text-3xl font-bold text-brand-accent">2+</div>
                 <div className="text-sm text-white/80">Tahun Pengalaman</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-brand-accent">500+</div>
+                <div className="text-3xl font-bold text-brand-accent">24+</div>
                 <div className="text-sm text-white/80">Anggota Aktif</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-brand-accent">50+</div>
+                <div className="text-3xl font-bold text-brand-accent">5+</div>
                 <div className="text-sm text-white/80">Program Sukses</div>
               </div>
             </div>
@@ -64,8 +63,8 @@ const HeroSection = () => {
           <div className="relative">
             <div className="relative z-10 bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
               <Image
-                src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&h=400&fit=crop"
-                alt="Tim OrganiFlow sedang berkolaborasi"
+                src="https://github.com/mukti-nux/portof-asset/blob/main/WhatsApp%20Image%202025-08-31%20at%2016.52.10_bc32efee.jpg?raw=true"
+                alt="Pelantikan PR IPM SMP Muhammadiyah Tempuran 24/25"
                 className="w-full h-80 object-cover rounded-xl"
               />
               <div className="absolute -bottom-4 -right-4 bg-brand-accent text-white p-4 rounded-xl shadow-lg">
