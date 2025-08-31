@@ -43,7 +43,7 @@ const Header = ({ className = '' }) => {
 
   const Logo = () => (
     <div className="flex items-center space-x-3">
-      <div className="w-10 h-10 bg-gradient-to-br from-brand-primary to-brand-secondary rounded-lg flex items-center justify-center">
+      <div className="w-10 h-10 rounded-lg flex items-center justify-center">
         <img
           src="/favicon.ico"
           alt="logoUtama"
@@ -52,7 +52,7 @@ const Header = ({ className = '' }) => {
       </div>
       <div className="flex flex-col">
         <span className="text-xl font-bold text-brand-primary tracking-tight">
-          PR IPM SMP MUHAMMADIYAH TEMPURAN
+          PR IPM SMP MUH TEMPURAN
         </span>
         <span className="text-xs text-muted-foreground font-medium -mt-1">
           Morals in Motion, Kindness in Action

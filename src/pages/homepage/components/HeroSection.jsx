@@ -26,7 +26,7 @@ const HeroSection = () => {
             <div className="space-y-4">
               <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium">
                 <Icon name="Sparkles" size={16} />
-                <span>Sistem Manajemen Organisasi Terdepan</span>
+                <span>Pengenalan Organisasi</span>
               </div>
               
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
@@ -35,7 +35,7 @@ const HeroSection = () => {
               </h1>
               
               <p className="text-xl lg:text-2xl text-white/90 leading-relaxed">
-                OrganiFlow menggabungkan transparansi dengan efisiensi, menciptakan ekosistem digital yang memberdayakan setiap anggota organisasi.
+                PR IPM SMP Muhammadiyah Tempuran melangkah lebih jauh dengan solusi digital kami yang inovatif, dirancang khusus untuk meningkatkan efisiensi dan keterlibatan anggota. Menggunakan basis Vite dan React membuat akses lebih mudah dan cepat.
               </p>
             </div>
 
@@ -67,16 +67,16 @@ const HeroSection = () => {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-8 pt-8 border-t border-white/20">
               <div className="text-center">
-                <div className="text-3xl font-bold">150+</div>
+                <div className="text-3xl font-bold">24+</div>
                 <div className="text-white/80 text-sm">Anggota Aktif</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold">98%</div>
+                <div className="text-3xl font-bold">89%</div>
                 <div className="text-white/80 text-sm">Kepuasan</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold">24/7</div>
-                <div className="text-white/80 text-sm">Dukungan AI</div>
+                <div className="text-white/80 text-sm">Dukungan CS</div>
               </div>
             </div>
           </div>

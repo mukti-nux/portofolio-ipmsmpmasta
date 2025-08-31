@@ -9,54 +9,44 @@ const MemberSpotlight = () => {
   const members = [
     {
       id: 1,
-      name: "Dr. Sari Wijayanti",
-      position: "Ketua Organisasi",
+      name: "Holy Safura Nurin Hasana",
+      position: "Ketua Organisasi periode 24/25",
       avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face",
-      achievement: "Memimpin transformasi digital organisasi dengan meningkatkan efisiensi operasional sebesar 85%",
-      department: "Kepemimpinan Eksekutif",
-      experience: "12 tahun",
+      achievement: "Meningkatkan partisipasi anggota sebesar 40% melalui inisiatif keterlibatan komunitas dan program pelatihan kepemimpinan",
+      department: "Kepemimpinan",
+      experience: "2 tahun",
       specialization: "Manajemen Strategis"
     },
     {
       id: 2,
-      name: "Ahmad Rizki Pratama",
-      position: "Sekretaris Jenderal",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
-      achievement: "Mengimplementasikan sistem dokumentasi digital yang mengurangi waktu pemrosesan dokumen hingga 70%",
+      name: "Zumila Dewi Safitri",
+      position: "Sekretaris Umum",
+      avatar: "https://github.com/mukti-nux/portof-asset/blob/main/0103508222.png?raw=true",
+      achievement: "Implementasi sistem dokumentasi digital yang mengurangi penggunaan kertas hingga 30% dan mempercepat akses informasi",
       department: "Sekretariat",
-      experience: "8 tahun",
-      specialization: "Administrasi & Dokumentasi"
+      experience: "2 tahun",
+      specialization: "Administrasi & Organisasi"
     },
     {
       id: 3,
-      name: "Maya Kusuma Dewi",
-      position: "Kepala Divisi Keanggotaan",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
-      achievement: "Berhasil meningkatkan engagement anggota melalui platform digital dan program mentoring",
-      department: "Keanggotaan",
-      experience: "6 tahun",
-      specialization: "Community Management"
+      name: "Firda Aulia Falevy",
+      position: "Bendahara Umum",
+      avatar: "https://github.com/mukti-nux/portof-asset/blob/main/3116331997.png?raw=true",
+      achievement: "Management keuangan yang transparan dan akurat, meningkatkan kepercayaan anggota terhadap pengelolaan dana organisasi",
+      department: "Keuangan",
+      experience: "2 tahun",
+      specialization: "Financial Planning & Analysis"
     },
     {
       id: 4,
-      name: "Budi Santoso",
-      position: "Koordinator Teknologi",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
-      achievement: "Mengembangkan infrastruktur AI chatbot yang melayani 95% pertanyaan anggota secara otomatis",
+      name: "Hasan Mukti Abdulloh",
+      position: "Ketua PIP",
+      avatar: "https://github.com/mukti-nux/portof-asset/blob/main/0102419866%20(1).png?raw=true",
+      achievement: "Pengembangan website organisasi yang meningkatkan visibilitas online dan interaksi anggota",
       department: "Teknologi Informasi",
-      experience: "10 tahun",
-      specialization: "AI & Automation"
+      experience: "2 tahun",
+      specialization: "Web Development, Graphic Design & AI"
     },
-    {
-      id: 5,
-      name: "Indira Sari Putri",
-      position: "Manajer Transparansi",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=400&fit=crop&crop=face",
-      achievement: "Menciptakan sistem pelaporan transparan yang meningkatkan kepercayaan stakeholder sebesar 92%",
-      department: "Transparansi & Akuntabilitas",
-      experience: "7 tahun",
-      specialization: "Public Relations"
-    }
   ];
 
   useEffect(() => {
@@ -90,7 +80,7 @@ const MemberSpotlight = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center space-x-2 bg-primary/10 text-primary rounded-full px-4 py-2 text-sm font-medium mb-4">
             <Icon name="Star" size={16} />
-            <span>Anggota Terbaik</span>
+            <span>Anggota yang Terlibat pembangunan Media Digital</span>
           </div>
           <h2 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
             Spotlight <span className="text-primary">Anggota</span>
