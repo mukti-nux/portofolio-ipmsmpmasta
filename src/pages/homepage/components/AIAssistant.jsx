@@ -30,7 +30,7 @@ const AIAssistant = () => {
     },
     {
       id: 3,
-      text: "Bagaimana cara mengakses dokumen?",
+      text: " ?",
       icon: "FileText"
     },
     {

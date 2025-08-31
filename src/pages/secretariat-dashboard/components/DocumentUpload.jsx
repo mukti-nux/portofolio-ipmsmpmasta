@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { supabase } from '../../../../lib/supabaseClient'; // tambahkan ini
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
@@ -14,6 +15,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
     priority: 'medium',
     deadline: ''
   });
+  const [loading, setLoading] = useState(false); // loading state
   const fileInputRef = useRef(null);
 
   const documentTypes = [
@@ -45,7 +47,6 @@ const DocumentUpload = ({ onUpload, onClose }) => {
     e?.preventDefault();
     e?.stopPropagation();
     setDragActive(false);
-    
     if (e?.dataTransfer?.files && e?.dataTransfer?.files?.[0]) {
       handleFiles(e?.dataTransfer?.files);
     }
@@ -74,22 +75,60 @@ const DocumentUpload = ({ onUpload, onClose }) => {
     return parseFloat((bytes / Math.pow(k, i))?.toFixed(2)) + ' ' + sizes?.[i];
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e?.preventDefault();
     if (files?.length === 0 || !formData?.title || !formData?.type) {
       alert('Mohon lengkapi semua field yang diperlukan');
       return;
     }
+    setLoading(true);
+
+    // Ambil user aktif dari Supabase Auth
+    let userEmail = 'Unknown User';
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) userEmail = user.email;
+    } catch {
+      // fallback
+    }
+
+    // Upload semua file ke Supabase Storage
+    const uploadedFiles = [];
+    for (const fileObj of files) {
+      const filePath = `${Date.now()}_${fileObj.name}`;
+      const { data, error } = await supabase.storage
+        .from('documents') // pastikan bucket 'documents' sudah dibuat di Supabase Storage
+        .upload(filePath, fileObj.file);
+
+      if (error) {
+        alert(`Gagal upload file: ${fileObj.name}`);
+        setLoading(false);
+        return;
+      }
+      // Dapatkan public URL file
+      const { data: publicUrlData } = supabase
+        .storage
+        .from('documents')
+        .getPublicUrl(filePath);
+
+      uploadedFiles.push({
+        name: fileObj.name,
+        url: publicUrlData.publicUrl,
+        size: fileObj.size,
+        type: fileObj.type
+      });
+    }
 
     const uploadData = {
       ...formData,
-      files: files,
+      files: uploadedFiles,
       submittedDate: new Date()?.toISOString(),
-      submittedBy: 'Admin User',
+      submittedBy: userEmail,
       status: 'pending'
     };
 
-    onUpload(uploadData);
+    await onUpload(uploadData);
+    setLoading(false);
   };
 
   return (
@@ -123,6 +162,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
               type="button"
               variant="outline"
               onClick={() => fileInputRef?.current?.click()}
+              disabled={loading}
             >
               Pilih File
             </Button>
@@ -133,6 +173,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
               className="hidden"
               onChange={(e) => handleFiles(e?.target?.files)}
               accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png"
+              disabled={loading}
             />
           </div>
 
@@ -155,6 +196,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
                     size="sm"
                     iconName="X"
                     onClick={() => removeFile(file?.id)}
+                    disabled={loading}
                   />
                 </div>
               ))}
@@ -170,6 +212,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
               value={formData?.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e?.target?.value }))}
               required
+              disabled={loading}
             />
 
             <Select
@@ -179,6 +222,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
               onChange={(value) => setFormData(prev => ({ ...prev, type: value }))}
               placeholder="Pilih jenis dokumen"
               required
+              disabled={loading}
             />
 
             <Select
@@ -186,6 +230,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
               options={priorityOptions}
               value={formData?.priority}
               onChange={(value) => setFormData(prev => ({ ...prev, priority: value }))}
+              disabled={loading}
             />
 
             <Input
@@ -194,6 +239,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
               value={formData?.deadline}
               onChange={(e) => setFormData(prev => ({ ...prev, deadline: e?.target?.value }))}
               required
+              disabled={loading}
             />
           </div>
 
@@ -203,15 +249,16 @@ const DocumentUpload = ({ onUpload, onClose }) => {
             placeholder="Deskripsi singkat dokumen"
             value={formData?.description}
             onChange={(e) => setFormData(prev => ({ ...prev, description: e?.target?.value }))}
+            disabled={loading}
           />
 
           {/* Action Buttons */}
           <div className="flex items-center justify-end space-x-3 pt-4 border-t border-border">
-            <Button type="button" variant="ghost" onClick={onClose}>
+            <Button type="button" variant="ghost" onClick={onClose} disabled={loading}>
               Batal
             </Button>
-            <Button type="submit" iconName="Upload">
-              Upload Dokumen
+            <Button type="submit" iconName="Upload" disabled={loading}>
+              {loading ? 'Uploading...' : 'Upload Dokumen'}
             </Button>
           </div>
         </form>

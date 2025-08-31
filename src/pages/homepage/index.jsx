@@ -17,18 +17,18 @@ const Homepage = () => {
     <>
       <Helmet>
         <title>OrganiFlow - Transformasi Digital Organisasi Modern</title>
-        <meta 
-          name="description" 
-          content="Platform manajemen organisasi terdepan yang menggabungkan transparansi dengan efisiensi. Sistem digital terintegrasi untuk organisasi modern di Indonesia." 
+        <meta
+          name="description"
+          content="Platform manajemen organisasi terdepan yang menggabungkan transparansi dengan efisiensi. Sistem digital terintegrasi untuk organisasi modern di Indonesia."
         />
-        <meta 
-          name="keywords" 
-          content="manajemen organisasi, sistem digital, transparansi, efisiensi, Indonesia, OrganiFlow" 
+        <meta
+          name="keywords"
+          content="manajemen organisasi, sistem digital, transparansi, efisiensi, Indonesia, OrganiFlow"
         />
         <meta property="og:title" content="OrganiFlow - Transformasi Digital Organisasi Modern" />
-        <meta 
-          property="og:description" 
-          content="Ekosistem digital yang memberdayakan setiap anggota organisasi dengan transparansi penuh dan efisiensi maksimal." 
+        <meta
+          property="og:description"
+          content="Ekosistem digital yang memberdayakan setiap anggota organisasi dengan transparansi penuh dan efisiensi maksimal."
         />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://organiflow.id/homepage" />
@@ -63,27 +63,56 @@ const Homepage = () => {
               {/* Brand */}
               <div className="md:col-span-2">
                 <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-brand-primary to-brand-secondary rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">O</span>
+                  {/* Logo */}
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                    <img
+                      src="/favicon.ico"
+                      alt="logoUtama"
+                      className="w-7 h-7 object-contain"
+                    />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-brand-primary">OrganiFlow</h3>
-                    <p className="text-sm text-muted-foreground">Progressive Management</p>
+                    <h3 className="text-xl font-bold text-brand-primary">PR IPM SMP Muh Tempuran</h3>
+                    <p className="text-sm text-muted-foreground">Morals in Motion, Kindness in Action</p>
                   </div>
                 </div>
                 <p className="text-muted-foreground mb-6 max-w-md">
-                  Transformasi digital untuk organisasi modern yang mengutamakan transparansi, 
+                  Transformasi digital untuk organisasi modern yang mengutamakan transparansi,
                   efisiensi, dan pemberdayaan anggota melalui teknologi terdepan.
                 </p>
                 <div className="flex space-x-4">
                   <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
-                    <span className="text-sm font-bold">f</span>
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                      <a href="https://maps.app.goo.gl/1ZmLqXQKaWFGze2w9" target="_blank" rel="noopener noreferrer">
+                        <img
+                          src="/logo/maps.png"
+                          alt="logomaps"
+                          className="w-7 h-7 object-contain"
+                        />
+                      </a>
+                    </div>
                   </div>
                   <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
-                    <span className="text-sm font-bold">t</span>
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                      <a href="https://www.instagram.com/ipm_smpmuhtempuran/?hl=en" target="_blank" rel="noopener noreferrer">
+                        <img
+                          src="/logo/ig.png"
+                          alt="logoig"
+                          className="w-7 h-7 object-contain"
+                        />
+                      </a>
+                    </div>
                   </div>
                   <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
-                    <span className="text-sm font-bold">in</span>
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                      <a href="https://wa.me/62081391442236" target="_blank" rel="noopener noreferrer">
+                        <img
+                          src="/logo/wa.png"
+                          alt="logowa"
+                          className="w-7 h-7 object-contain"
+                        />
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -103,17 +132,17 @@ const Homepage = () => {
               <div>
                 <h4 className="font-semibold text-foreground mb-4">Kontak</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>info@organiflow.id</li>
-                  <li>(021) 1234-5678</li>
-                  <li>Jl. Organisasi Modern No. 123</li>
-                  <li>Jakarta, Indonesia</li>
+                  <li>pripmsmpmuhtpr@gmail.com</li>
+                  <li>(081) 0813-9144-2236</li>
+                  <li>Jl. Magelang-Purworejo Km.10 Tempuran, Magelang 56172</li>
+                  <li>Magelang, Indonesia</li>
                 </ul>
               </div>
             </div>
 
             <div className="border-t border-border mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
               <p className="text-sm text-muted-foreground">
-                © {new Date()?.getFullYear()} OrganiFlow. Seluruh hak cipta dilindungi.
+                © {new Date()?.getFullYear()} PR IPM SMP Muh Tempuran. Seluruh hak cipta dilindungi.
               </p>
               <div className="flex space-x-6 text-sm text-muted-foreground mt-4 md:mt-0">
                 <a href="/privacy" className="hover:text-primary transition-colors">Kebijakan Privasi</a>
