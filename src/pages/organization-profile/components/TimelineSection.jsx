@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 
 const TimelineSection = () => {
-  const [activeYear, setActiveYear] = useState(2024);
+  const [activeYear, setActiveYear] = useState(2025);
 
   const timelineData = [
     {
-      year: 2009,
-      title: 'Pendirian Organisasi',
-      description: 'OrganiFlow didirikan dengan visi menciptakan solusi manajemen organisasi yang inovatif.',
-      achievements: ['Tim pendiri 5 orang', 'Konsep awal platform digital', 'Riset kebutuhan organisasi'],
+      year: '18 jan 2025',
+      title: 'Pelantikan Organisasi',
+      description: 'Pelantikan resmi anggota IPM SMP Muhammadiyah Tempuran periode 2024-2025.',
+      achievements: ['Tim pendiri 24 orang', 'Konsep awal keorganisasian', 'Riset kebutuhan organisasi'],
       icon: 'Rocket',
       color: 'bg-blue-500'
     },
