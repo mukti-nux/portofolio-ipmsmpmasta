@@ -108,7 +108,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
       // Dapatkan public URL file
       const { data: publicUrlData } = supabase
         .storage
-        .from('documents')
+        .from('Documents')
         .getPublicUrl(filePath);
 
       uploadedFiles.push({
