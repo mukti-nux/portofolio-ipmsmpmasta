@@ -94,30 +94,48 @@ const DocumentUpload = ({ onUpload, onClose }) => {
 
     // Upload semua file ke Supabase Storage
     const uploadedFiles = [];
+
     for (const fileObj of files) {
       const filePath = `${Date.now()}_${fileObj.name}`;
+
+      console.log("🚀 Uploading file...");
+      console.log("Bucket:", "document");
+      console.log("File path:", filePath);
+      console.log("File object:", fileObj.file);
+      console.log("Is File instance:", fileObj.file instanceof File);
+      console.log("File size:", fileObj.file?.size);
+      console.log("File type:", fileObj.file?.type);
+
       const { data, error } = await supabase.storage
-        .from('documents') // pastikan bucket 'documents' sudah dibuat di Supabase Storage
-        .upload(filePath, fileObj.file);
+        .from("document") // <- pastikan lowercase sesuai bucket
+        .upload(filePath, fileObj.file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
 
       if (error) {
-        alert(`Gagal upload file: ${fileObj.name}`);
+        console.error("❌ Upload error details:", error);
+        alert(`Gagal upload file: ${fileObj.name}\nError: ${error.message}`);
         setLoading(false);
         return;
       }
-      // Dapatkan public URL file
-      const { data: publicUrlData } = supabase
-        .storage
-        .from('documents')
+
+      console.log("✅ Upload success:", data);
+
+      const { data: publicUrlData } = supabase.storage
+        .from("document")
         .getPublicUrl(filePath);
+
+      console.log("🌐 Public URL:", publicUrlData.publicUrl);
 
       uploadedFiles.push({
         name: fileObj.name,
         url: publicUrlData.publicUrl,
         size: fileObj.size,
-        type: fileObj.type
+        type: fileObj.type,
       });
     }
+
 
     const uploadData = {
       ...formData,
@@ -142,10 +160,9 @@ const DocumentUpload = ({ onUpload, onClose }) => {
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* File Upload Area */}
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              dragActive 
-                ? 'border-primary bg-primary/5' :'border-border hover:border-primary/50'
-            }`}
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${dragActive
+              ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
+              }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
