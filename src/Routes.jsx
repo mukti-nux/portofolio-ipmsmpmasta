@@ -12,7 +12,7 @@ import OrganizationProfile from "./pages/organization-profile";
 import Homepage from "./pages/homepage";
 
 import RequireAuth from "./pages/auth/RequireAuth";
-import Login from "./../src/pages/auth"; 
+import Login from "./pages/auth/Login"; 
 
 const Routes = () => {
   return (
