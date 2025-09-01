@@ -97,7 +97,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
     for (const fileObj of files) {
       const filePath = `${Date.now()}_${fileObj.name}`;
       const { data, error } = await supabase.storage
-        .from('Documents') // pastikan bucket 'documents' sudah dibuat di Supabase Storage
+        .from('documents') // pastikan bucket 'documents' sudah dibuat di Supabase Storage
         .upload(filePath, fileObj.file);
 
       if (error) {
@@ -108,7 +108,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
       // Dapatkan public URL file
       const { data: publicUrlData } = supabase
         .storage
-        .from('Documents')
+        .from('documents')
         .getPublicUrl(filePath);
 
       uploadedFiles.push({
