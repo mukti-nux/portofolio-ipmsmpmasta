@@ -9,7 +9,6 @@ import MemberManagementSuite from './pages/member-management-suite';
 import SecretariatDashboard from './pages/secretariat-dashboard';
 import OrganizationProfile from './pages/organization-profile';
 import Homepage from './pages/homepage';
-import Login from './pages/auth/Login';
 import RequireAuth from './pages/auth/RequireAuth';
 
 const Routes = () => {
