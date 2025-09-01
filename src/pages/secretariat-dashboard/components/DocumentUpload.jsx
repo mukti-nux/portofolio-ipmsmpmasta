@@ -97,7 +97,7 @@ const DocumentUpload = ({ onUpload, onClose }) => {
     for (const fileObj of files) {
       const filePath = `${Date.now()}_${fileObj.name}`;
       const { data, error } = await supabase.storage
-        .from('documents') // pastikan bucket 'documents' sudah dibuat di Supabase Storage
+        .from('Documents') // pastikan bucket 'documents' sudah dibuat di Supabase Storage
         .upload(filePath, fileObj.file);
 
       if (error) {
