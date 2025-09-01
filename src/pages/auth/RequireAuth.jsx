@@ -10,7 +10,7 @@ const RequireAuth = ({ children }) => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate('/auth/login', { replace: true });
+        navigate('/login', { replace: true });
       } else {
         setChecking(false);
       }
