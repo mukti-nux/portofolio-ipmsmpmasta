@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
-import login from './Login'
 
 const RequireAuth = ({ children }) => {
   const [checking, setChecking] = useState(true);
@@ -11,7 +10,7 @@ const RequireAuth = ({ children }) => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate('/Login', { replace: true });
+        navigate('/auth/login', { replace: true });
       } else {
         setChecking(false);
       }
