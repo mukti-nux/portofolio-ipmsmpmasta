@@ -1,19 +1,77 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../../../lib/supabaseClient';
 import Icon from '../../../components/AppIcon';
 
-const StatisticsCards = ({ statistics }) => {
+const StatisticsCards = () => {
+  const [statistics, setStatistics] = useState({
+    totalDocuments: 0,
+    pendingDocuments: 0,
+    approvedThisMonth: 0,
+    averageProcessingTime: 0,
+  });
+
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      // 1. Total Dokumen
+      const { count: totalCount } = await supabase
+        .from('document')
+        .select('*', { count: 'exact', head: true });
+
+      // 2. Pending Dokumen
+      const { count: pendingCount } = await supabase
+        .from('document')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      // 3. Disetujui Bulan Ini
+      const now = new Date();
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const { count: approvedThisMonth } = await supabase
+        .from('document')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'approved')
+        .gte('submittedDate', firstDayOfMonth);
+
+      // 4. Rata-rata waktu proses (butuh kolom submittedDate & approvedDate)
+      const { data: approvedDocs } = await supabase
+        .from('document')
+        .select('submittedDate, approvedDate')
+        .not('approvedDate', 'is', null);
+
+      let avgDays = 0;
+      if (approvedDocs?.length) {
+        const totalDays = approvedDocs.reduce((acc, doc) => {
+          const submitted = new Date(doc.submittedDate);
+          const approved = new Date(doc.approvedDate);
+          const diffDays = (approved - submitted) / (1000 * 60 * 60 * 24);
+          return acc + diffDays;
+        }, 0);
+        avgDays = (totalDays / approvedDocs.length).toFixed(1);
+      }
+
+      setStatistics({
+        totalDocuments: totalCount || 0,
+        pendingDocuments: pendingCount || 0,
+        approvedThisMonth: approvedThisMonth || 0,
+        averageProcessingTime: avgDays || 0,
+      });
+    };
+
+    fetchStatistics();
+  }, []);
+
   const cards = [
     {
       title: 'Total Dokumen',
-      value: statistics?.totalDocuments,
+      value: statistics.totalDocuments,
       icon: 'FileText',
       color: 'bg-primary text-primary-foreground',
-      trend: '+12%',
+      trend: '+12%', // ini masih dummy, bisa diganti hitung beneran
       trendUp: true
     },
     {
       title: 'Menunggu Persetujuan',
-      value: statistics?.pendingDocuments,
+      value: statistics.pendingDocuments,
       icon: 'Clock',
       color: 'bg-warning text-warning-foreground',
       trend: '+5',
@@ -21,7 +79,7 @@ const StatisticsCards = ({ statistics }) => {
     },
     {
       title: 'Disetujui Bulan Ini',
-      value: statistics?.approvedThisMonth,
+      value: statistics.approvedThisMonth,
       icon: 'CheckCircle',
       color: 'bg-success text-success-foreground',
       trend: '+18%',
@@ -29,7 +87,7 @@ const StatisticsCards = ({ statistics }) => {
     },
     {
       title: 'Rata-rata Waktu Proses',
-      value: `${statistics?.averageProcessingTime} hari`,
+      value: `${statistics.averageProcessingTime} hari`,
       icon: 'Timer',
       color: 'bg-secondary text-secondary-foreground',
       trend: '-2 hari',
