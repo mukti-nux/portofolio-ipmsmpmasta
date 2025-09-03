@@ -9,7 +9,7 @@ import WorkflowVisualization from './components/WorkflowVisualization';
 import StatisticsCards from './components/StatisticsCards';
 import RecentActivity from './components/RecentActivity';
 import DocumentViewer from './components/DocumentViewer';
-import { supabase } from '../../lib/supabaseClient';
+import { supabase } from '../../../lib/supabaseClient';
 
 const SecretariatDashboard = () => {
   const [documents, setDocuments] = useState([]);
