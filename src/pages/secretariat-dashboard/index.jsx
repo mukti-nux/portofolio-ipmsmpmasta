@@ -1,247 +1,211 @@
-import React, { useState, useEffect } from 'react';
-import Header from '../../components/ui/Header';
-import Icon from '../../components/AppIcon';
-import Button from '../../components/ui/Button';
-import DocumentCard from './components/DocumentCard';
-import DocumentFilters from './components/DocumentFilters';
-import DocumentUpload from './components/DocumentUpload';
-import WorkflowVisualization from './components/WorkflowVisualization';
-import StatisticsCards from './components/StatisticsCards';
-import RecentActivity from './components/RecentActivity';
-import DocumentViewer from './components/DocumentViewer';
-import { supabase } from '../../../lib/supabaseClient';
+import React, { useState, useEffect } from "react";
+import { supabase } from "../../../lib/supabaseClient"; // pastikan ada supabaseClient.js
+import Header from "../../components/ui/Header";
+import Icon from "../../components/AppIcon";
+import Button from "../../components/ui/Button";
+import DocumentCard from "./components/DocumentCard";
+import DocumentFilters from "./components/DocumentFilters";
+import DocumentUpload from "./components/DocumentUpload";
+import WorkflowVisualization from "./components/WorkflowVisualization";
+import StatisticsCards from "./components/StatisticsCards";
+import RecentActivity from "./components/RecentActivity";
+import DocumentViewer from "./components/DocumentViewer";
 
 const SecretariatDashboard = () => {
   const [documents, setDocuments] = useState([]);
   const [filteredDocuments, setFilteredDocuments] = useState([]);
-  const [filters, setFilters] = useState({
-    status: 'all',
-    type: 'all',
-    priority: 'all',
-    search: '',
-    startDate: '',
-    endDate: '',
-    submitter: ''
-  });
   const [activities, setActivities] = useState([]);
-  const [statistics, setStatistics] = useState({});
+  const [statistics, setStatistics] = useState({
+    totalDocuments: 0,
+    pendingDocuments: 0,
+    approvedThisMonth: 0,
+    averageProcessingTime: 0,
+  });
+
+  const [filters, setFilters] = useState({
+    status: "all",
+    type: "all",
+    priority: "all",
+    search: "",
+    startDate: "",
+    endDate: "",
+    submitter: "",
+  });
+
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showWorkflowModal, setShowWorkflowModal] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [showDocumentViewer, setShowDocumentViewer] = useState(false);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState("grid");
 
-  // Fetch documents
+  // 🔹 Fetch data dokumen
+  const fetchDocuments = async () => {
+    const { data, error } = await supabase
+      .from("document")
+      .select("*")
+      .order("submitted_date", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching documents:", error);
+    } else {
+      setDocuments(data);
+      setFilteredDocuments(data);
+    }
+  };
+
+  // 🔹 Fetch aktivitas
+  const fetchActivities = async () => {
+    const { data, error } = await supabase
+      .from("activity")
+      .select("*, document(title)")
+      .order("timestamp", { ascending: false })
+      .limit(10);
+
+    if (error) {
+      console.error("Error fetching activities:", error);
+    } else {
+      setActivities(data);
+    }
+  };
+
+  // 🔹 Fetch statistik
+  const fetchStatistics = async () => {
+    // total dokumen
+    const { count: total } = await supabase
+      .from("document")
+      .select("*", { count: "exact", head: true });
+
+    // pending
+    const { count: pending } = await supabase
+      .from("document")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "pending");
+
+    // approved bulan ini
+    const startOfMonth = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    ).toISOString();
+
+    const { count: approvedThisMonth } = await supabase
+      .from("document")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "approved")
+      .gte("approval_date", startOfMonth);
+
+    // rata-rata waktu proses (approval_date - submitted_date)
+    const { data: approvedDocs } = await supabase
+      .from("document")
+      .select("submitted_date, approval_date")
+      .not("approval_date", "is", null);
+
+    let avgTime = 0;
+    if (approvedDocs?.length > 0) {
+      const totalDays = approvedDocs.reduce((acc, doc) => {
+        const start = new Date(doc.submitted_date);
+        const end = new Date(doc.approval_date);
+        return acc + (end - start) / (1000 * 60 * 60 * 24);
+      }, 0);
+      avgTime = (totalDays / approvedDocs.length).toFixed(1);
+    }
+
+    setStatistics({
+      totalDocuments: total || 0,
+      pendingDocuments: pending || 0,
+      approvedThisMonth: approvedThisMonth || 0,
+      averageProcessingTime: avgTime,
+    });
+  };
+
+  // 🔹 Jalankan fetch saat load
   useEffect(() => {
-    const fetchDocuments = async () => {
-      const { data, error } = await supabase
-        .from('document')
-        .select('*')
-        .order('submitted_date', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching documents:', error);
-      } else {
-        setDocuments(data);
-        setFilteredDocuments(data);
-      }
-    };
-
     fetchDocuments();
-  }, []);
-
-  // Fetch activities
-  useEffect(() => {
-    const fetchActivities = async () => {
-      const { data, error } = await supabase
-        .from('activity')
-        .select(`
-          id, type, action, user, timestamp,
-          document:document_id (id, title)
-        `)
-        .order('timestamp', { ascending: false })
-        .limit(10);
-
-      if (error) {
-        console.error('Error fetching activities:', error);
-      } else {
-        setActivities(data);
-      }
-    };
-
     fetchActivities();
+    fetchStatistics();
   }, []);
 
-  // Fetch statistics
-  useEffect(() => {
-    const fetchStats = async () => {
-      const { count: totalDocuments } = await supabase
-        .from('document')
-        .select('*', { count: 'exact', head: true });
-
-      const { count: pendingDocuments } = await supabase
-        .from('document')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'pending');
-
-      const { count: approvedThisMonth } = await supabase
-        .from('document')
-        .select('*', { count: 'exact', head: true })
-        .eq('status', 'approved');
-
-      setStatistics({
-        totalDocuments,
-        pendingDocuments,
-        approvedThisMonth,
-        averageProcessingTime: 0 // bisa dihitung lebih detail
-      });
-    };
-
-    fetchStats();
-  }, []);
-
-  // Apply filters
+  // 🔹 Filtering dokumen
   useEffect(() => {
     let filtered = documents;
 
-    if (filters?.status !== 'all') {
-      filtered = filtered?.filter(doc => doc?.status === filters?.status);
+    if (filters?.status !== "all") {
+      filtered = filtered.filter((doc) => doc?.status === filters?.status);
     }
-    if (filters?.type !== 'all') {
-      filtered = filtered?.filter(doc => doc?.type === filters?.type);
+    if (filters?.type !== "all") {
+      filtered = filtered.filter((doc) => doc?.type === filters?.type);
     }
-    if (filters?.priority !== 'all') {
-      filtered = filtered?.filter(doc => doc?.priority === filters?.priority);
+    if (filters?.priority !== "all") {
+      filtered = filtered.filter((doc) => doc?.priority === filters?.priority);
     }
     if (filters?.search) {
-      filtered = filtered?.filter(doc =>
-        doc?.title?.toLowerCase()?.includes(filters?.search?.toLowerCase()) ||
-        doc?.description?.toLowerCase()?.includes(filters?.search?.toLowerCase())
+      filtered = filtered.filter(
+        (doc) =>
+          doc?.title?.toLowerCase()?.includes(filters?.search?.toLowerCase()) ||
+          doc?.description
+            ?.toLowerCase()
+            ?.includes(filters?.search?.toLowerCase())
       );
     }
     if (filters?.submitter) {
-      filtered = filtered?.filter(doc =>
-        doc?.submitted_by?.toLowerCase()?.includes(filters?.submitter?.toLowerCase())
+      filtered = filtered.filter((doc) =>
+        doc?.submitted_by
+          ?.toLowerCase()
+          ?.includes(filters?.submitter?.toLowerCase())
       );
     }
     if (filters?.startDate) {
-      filtered = filtered?.filter(doc =>
-        new Date(doc.submitted_date) >= new Date(filters.startDate)
+      filtered = filtered.filter(
+        (doc) => new Date(doc.submitted_date) >= new Date(filters.startDate)
       );
     }
     if (filters?.endDate) {
-      filtered = filtered?.filter(doc =>
-        new Date(doc.submitted_date) <= new Date(filters.endDate)
+      filtered = filtered.filter(
+        (doc) => new Date(doc.submitted_date) <= new Date(filters.endDate)
       );
     }
 
     setFilteredDocuments(filtered);
   }, [filters, documents]);
 
-  // Handle filter changes
+  // 🔹 Event handler
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleResetFilters = () => {
     setFilters({
-      status: 'all',
-      type: 'all',
-      priority: 'all',
-      search: '',
-      startDate: '',
-      endDate: '',
-      submitter: ''
+      status: "all",
+      type: "all",
+      priority: "all",
+      search: "",
+      startDate: "",
+      endDate: "",
+      submitter: "",
     });
   };
 
-  // Upload document
   const handleDocumentUpload = async (uploadData) => {
-    const { data, error } = await supabase
-      .from('document')
-      .insert([{
-        title: uploadData.title,
-        description: uploadData.description,
-        type: uploadData.type,
-        status: 'pending',
-        priority: uploadData.priority,
-        submitted_by: 'Admin User',
+    const { data, error } = await supabase.from("document").insert([
+      {
+        title: uploadData?.title,
+        description: uploadData?.description,
+        type: uploadData?.type,
+        status: "pending",
+        priority: uploadData?.priority,
+        submitted_by: "Admin User",
         submitted_date: new Date().toISOString(),
-        deadline: uploadData.deadline,
-        review_date: null,
-        approval_date: null,
-        finalized_date: null,
-        finalized_by: null
-      }])
-      .select()
-      .single();
+        deadline: uploadData?.deadline,
+      },
+    ]);
 
     if (error) {
-      console.error('Error uploading document:', error);
+      console.error("Upload error:", error);
     } else {
-      setDocuments(prev => [data, ...prev]);
+      fetchDocuments();
+      fetchActivities();
+      fetchStatistics();
       setShowUploadModal(false);
-    }
-  };
-
-  // Approve document
-  const handleDocumentApprove = async (document) => {
-    const { data, error } = await supabase
-      .from('document')
-      .update({
-        status: 'approved',
-        approval_date: new Date().toISOString(),
-        finalized_date: new Date().toISOString(),
-        finalized_by: 'Admin User'
-      })
-      .eq('id', document.id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error approving document:', error);
-    } else {
-      setDocuments(prev => prev.map(doc => doc.id === document.id ? data : doc));
-    }
-  };
-
-  // Reject document
-  const handleDocumentReject = async (document) => {
-    const { data, error } = await supabase
-      .from('document')
-      .update({
-        status: 'rejected',
-        approval_date: new Date().toISOString(),
-        finalized_date: new Date().toISOString(),
-        finalized_by: 'Admin User'
-      })
-      .eq('id', document.id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error rejecting document:', error);
-    } else {
-      setDocuments(prev => prev.map(doc => doc.id === document.id ? data : doc));
-    }
-  };
-
-  // Download document from Storage
-  const handleDocumentDownload = async (document) => {
-    const { data, error } = await supabase
-      .storage
-      .from('document')
-      .download(document.file_path);
-
-    if (error) {
-      console.error('Error downloading file:', error);
-    } else {
-      const url = URL.createObjectURL(data);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = document.title;
-      a.click();
-      URL.revokeObjectURL(url);
     }
   };
 
@@ -250,9 +214,41 @@ const SecretariatDashboard = () => {
     setShowDocumentViewer(true);
   };
 
-  const handleWorkflowView = (document) => {
-    setSelectedDocument(document);
-    setShowWorkflowModal(true);
+  const handleDocumentApprove = async (document) => {
+    await supabase
+      .from("document")
+      .update({
+        status: "approved",
+        approval_date: new Date().toISOString(),
+        finalized_date: new Date().toISOString(),
+        finalized_by: "Admin User",
+      })
+      .eq("id", document.id);
+
+    fetchDocuments();
+    fetchActivities();
+    fetchStatistics();
+  };
+
+  const handleDocumentReject = async (document) => {
+    await supabase
+      .from("document")
+      .update({
+        status: "rejected",
+        approval_date: new Date().toISOString(),
+        finalized_date: new Date().toISOString(),
+        finalized_by: "Admin User",
+      })
+      .eq("id", document.id);
+
+    fetchDocuments();
+    fetchActivities();
+    fetchStatistics();
+  };
+
+  const handleDocumentDownload = (document) => {
+    // TODO: ambil file dari Supabase Storage
+    alert(`Mengunduh dokumen: ${document?.title}`);
   };
 
   return (
@@ -274,16 +270,16 @@ const SecretariatDashboard = () => {
             <div className="flex items-center space-x-3">
               <div className="flex items-center bg-muted rounded-lg p-1">
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
                   iconName="Grid3X3"
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => setViewMode("grid")}
                 />
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
                   iconName="List"
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode("list")}
                 />
               </div>
 
@@ -295,10 +291,7 @@ const SecretariatDashboard = () => {
                 Workflow
               </Button>
 
-              <Button
-                iconName="Plus"
-                onClick={() => setShowUploadModal(true)}
-              >
+              <Button iconName="Plus" onClick={() => setShowUploadModal(true)}>
                 Upload Dokumen
               </Button>
             </div>
@@ -327,17 +320,25 @@ const SecretariatDashboard = () => {
                   <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                     <Icon name="Filter" size={16} />
                     <span>
-                      {filters?.status !== 'all' || filters?.type !== 'all' || filters?.priority !== 'all' || filters?.search || filters?.submitter
-                        ? 'Filter aktif'
-                        : 'Semua dokumen'}
+                      {filters?.status !== "all" ||
+                      filters?.type !== "all" ||
+                      filters?.priority !== "all" ||
+                      filters?.search ||
+                      filters?.submitter
+                        ? "Filter aktif"
+                        : "Semua dokumen"}
                     </span>
                   </div>
                 </div>
 
                 {filteredDocuments?.length > 0 ? (
-                  <div className={viewMode === 'grid'
-                    ? 'grid grid-cols-1 lg:grid-cols-2 gap-6'
-                    : 'space-y-4'}>
+                  <div
+                    className={
+                      viewMode === "grid"
+                        ? "grid grid-cols-1 lg:grid-cols-2 gap-6"
+                        : "space-y-4"
+                    }
+                  >
                     {filteredDocuments?.map((document) => (
                       <DocumentCard
                         key={document?.id}
@@ -351,7 +352,11 @@ const SecretariatDashboard = () => {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <Icon name="FileX" size={64} className="mx-auto mb-4 text-muted-foreground" />
+                    <Icon
+                      name="FileX"
+                      size={64}
+                      className="mx-auto mb-4 text-muted-foreground"
+                    />
                     <h3 className="text-lg font-medium text-foreground mb-2">
                       Tidak ada dokumen ditemukan
                     </h3>
@@ -377,6 +382,7 @@ const SecretariatDashboard = () => {
           </div>
         </div>
       </div>
+
       {/* Modals */}
       {showUploadModal && (
         <DocumentUpload
@@ -399,7 +405,9 @@ const SecretariatDashboard = () => {
               />
             </div>
             <div className="p-6">
-              <WorkflowVisualization document={selectedDocument || documents?.[0]} />
+              <WorkflowVisualization
+                document={selectedDocument || documents?.[0]}
+              />
             </div>
           </div>
         </div>
