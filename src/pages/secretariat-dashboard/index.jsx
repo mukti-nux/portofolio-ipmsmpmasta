@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { supabase } from "../../../lib/supabaseClient"; // pastikan ada supabaseClient.js
+import { supabase } from "../../../lib/supabaseClient"; // 🔹 pastikan file ini ada
 import Header from "../../components/ui/Header";
 import Icon from "../../components/AppIcon";
 import Button from "../../components/ui/Button";
@@ -38,7 +38,17 @@ const SecretariatDashboard = () => {
   const [showDocumentViewer, setShowDocumentViewer] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
 
-  // 🔹 Fetch data dokumen
+  // 🔹 Helper untuk mapping snake_case → camelCase
+  const mapDocument = (doc) => ({
+    ...doc,
+    submittedDate: doc.submitted_date,
+    submittedBy: doc.submitted_by,
+    approvalDate: doc.approval_date,
+    finalizedDate: doc.finalized_date,
+    finalizedBy: doc.finalized_by,
+  });
+
+  // 🔹 Fetch dokumen
   const fetchDocuments = async () => {
     const { data, error } = await supabase
       .from("document")
@@ -48,8 +58,9 @@ const SecretariatDashboard = () => {
     if (error) {
       console.error("Error fetching documents:", error);
     } else {
-      setDocuments(data);
-      setFilteredDocuments(data);
+      const mapped = data.map(mapDocument);
+      setDocuments(mapped);
+      setFilteredDocuments(mapped);
     }
   };
 
@@ -94,7 +105,7 @@ const SecretariatDashboard = () => {
       .eq("status", "approved")
       .gte("approval_date", startOfMonth);
 
-    // rata-rata waktu proses (approval_date - submitted_date)
+    // rata-rata waktu proses
     const { data: approvedDocs } = await supabase
       .from("document")
       .select("submitted_date, approval_date")
@@ -129,39 +140,39 @@ const SecretariatDashboard = () => {
   useEffect(() => {
     let filtered = documents;
 
-    if (filters?.status !== "all") {
-      filtered = filtered.filter((doc) => doc?.status === filters?.status);
+    if (filters.status !== "all") {
+      filtered = filtered.filter((doc) => doc?.status === filters.status);
     }
-    if (filters?.type !== "all") {
-      filtered = filtered.filter((doc) => doc?.type === filters?.type);
+    if (filters.type !== "all") {
+      filtered = filtered.filter((doc) => doc?.type === filters.type);
     }
-    if (filters?.priority !== "all") {
-      filtered = filtered.filter((doc) => doc?.priority === filters?.priority);
+    if (filters.priority !== "all") {
+      filtered = filtered.filter((doc) => doc?.priority === filters.priority);
     }
-    if (filters?.search) {
+    if (filters.search) {
       filtered = filtered.filter(
         (doc) =>
-          doc?.title?.toLowerCase()?.includes(filters?.search?.toLowerCase()) ||
+          doc?.title?.toLowerCase().includes(filters.search.toLowerCase()) ||
           doc?.description
             ?.toLowerCase()
-            ?.includes(filters?.search?.toLowerCase())
+            .includes(filters.search.toLowerCase())
       );
     }
-    if (filters?.submitter) {
+    if (filters.submitter) {
       filtered = filtered.filter((doc) =>
-        doc?.submitted_by
+        doc?.submittedBy
           ?.toLowerCase()
-          ?.includes(filters?.submitter?.toLowerCase())
+          .includes(filters.submitter.toLowerCase())
       );
     }
-    if (filters?.startDate) {
+    if (filters.startDate) {
       filtered = filtered.filter(
-        (doc) => new Date(doc.submitted_date) >= new Date(filters.startDate)
+        (doc) => new Date(doc.submittedDate) >= new Date(filters.startDate)
       );
     }
-    if (filters?.endDate) {
+    if (filters.endDate) {
       filtered = filtered.filter(
-        (doc) => new Date(doc.submitted_date) <= new Date(filters.endDate)
+        (doc) => new Date(doc.submittedDate) <= new Date(filters.endDate)
       );
     }
 
@@ -186,7 +197,7 @@ const SecretariatDashboard = () => {
   };
 
   const handleDocumentUpload = async (uploadData) => {
-    const { data, error } = await supabase.from("document").insert([
+    const { error } = await supabase.from("document").insert([
       {
         title: uploadData?.title,
         description: uploadData?.description,
@@ -320,11 +331,11 @@ const SecretariatDashboard = () => {
                   <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                     <Icon name="Filter" size={16} />
                     <span>
-                      {filters?.status !== "all" ||
-                      filters?.type !== "all" ||
-                      filters?.priority !== "all" ||
-                      filters?.search ||
-                      filters?.submitter
+                      {filters.status !== "all" ||
+                      filters.type !== "all" ||
+                      filters.priority !== "all" ||
+                      filters.search ||
+                      filters.submitter
                         ? "Filter aktif"
                         : "Semua dokumen"}
                     </span>
