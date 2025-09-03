@@ -9,6 +9,7 @@ import WorkflowVisualization from './components/WorkflowVisualization';
 import StatisticsCards from './components/StatisticsCards';
 import RecentActivity from './components/RecentActivity';
 import DocumentViewer from './components/DocumentViewer';
+import { supabase } from '../../lib/supabaseClient';
 
 const SecretariatDashboard = () => {
   const [documents, setDocuments] = useState([]);
@@ -22,145 +23,87 @@ const SecretariatDashboard = () => {
     endDate: '',
     submitter: ''
   });
+  const [activities, setActivities] = useState([]);
+  const [statistics, setStatistics] = useState({});
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showWorkflowModal, setShowWorkflowModal] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [showDocumentViewer, setShowDocumentViewer] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
 
-  // Mock data
-  const mockDocuments = [
-    {
-      id: 1,
-      title: "Proposal Kegiatan Bakti Sosial 2025",
-      description: "Proposal untuk kegiatan bakti sosial yang akan dilaksanakan pada bulan Februari 2025 di wilayah Jakarta Selatan. Kegiatan ini meliputi pembagian sembako dan pemeriksaan kesehatan gratis.",
-      type: "proposal",
-      status: "pending",
-      priority: "high",
-      submittedBy: "Ahmad Rizki",
-      submittedDate: "2025-01-28T10:30:00Z",
-      deadline: "2025-02-05T23:59:59Z",
-      reviewDate: null,
-      approvalDate: null,
-      finalizedDate: null,
-      finalizedBy: null
-    },
-    {
-      id: 2,
-      title: "Laporan Keuangan Triwulan IV 2024",
-      description: "Laporan keuangan lengkap untuk periode Oktober-Desember 2024 termasuk neraca, laporan laba rugi, dan arus kas organisasi.",
-      type: "laporan",
-      status: "approved",
-      priority: "high",
-      submittedBy: "Siti Nurhaliza",
-      submittedDate: "2025-01-25T14:15:00Z",
-      deadline: "2025-01-30T23:59:59Z",
-      reviewDate: "2025-01-26T09:00:00Z",
-      approvalDate: "2025-01-27T16:30:00Z",
-      finalizedDate: "2025-01-27T16:30:00Z",
-      finalizedBy: "Kepala Sekretariat"
-    },
-    {
-      id: 3,
-      title: "Surat Permohonan Kerjasama dengan Universitas Indonesia",
-      description: "Surat resmi untuk menjalin kerjasama dalam bidang penelitian dan pengembangan masyarakat dengan Fakultas Ilmu Sosial dan Politik UI.",
-      type: "surat",
-      status: "in_review",
-      priority: "medium",
-      submittedBy: "Dr. Bambang Sutrisno",
-      submittedDate: "2025-01-26T11:45:00Z",
-      deadline: "2025-02-10T23:59:59Z",
-      reviewDate: "2025-01-27T08:00:00Z",
-      approvalDate: null,
-      finalizedDate: null,
-      finalizedBy: null
-    },
-    {
-      id: 4,
-      title: "Notulen Rapat Pengurus Bulanan Januari 2025",
-      description: "Catatan lengkap hasil rapat pengurus yang membahas program kerja, evaluasi kegiatan, dan rencana strategis untuk semester pertama 2025.",
-      type: "notulen",
-      status: "pending",
-      priority: "low",
-      submittedBy: "Maya Sari",
-      submittedDate: "2025-01-29T16:20:00Z",
-      deadline: "2025-02-03T23:59:59Z",
-      reviewDate: null,
-      approvalDate: null,
-      finalizedDate: null,
-      finalizedBy: null
-    },
-    {
-      id: 5,
-      title: "Rancangan Anggaran Kegiatan Seminar Nasional",
-      description: "Detail anggaran untuk penyelenggaraan seminar nasional tentang \'Inovasi Digital dalam Pemberdayaan Masyarakat\' yang akan diselenggarakan pada Maret 2025.",
-      type: "anggaran",
-      status: "rejected",
-      priority: "medium",
-      submittedBy: "Eko Prasetyo",
-      submittedDate: "2025-01-24T13:10:00Z",
-      deadline: "2025-02-01T23:59:59Z",
-      reviewDate: "2025-01-25T10:00:00Z",
-      approvalDate: "2025-01-26T14:20:00Z",
-      finalizedDate: "2025-01-26T14:20:00Z",
-      finalizedBy: "Kepala Sekretariat"
-    }
-  ];
-
-  const mockStatistics = {
-    totalDocuments: 156,
-    pendingDocuments: 23,
-    approvedThisMonth: 45,
-    averageProcessingTime: 3.2
-  };
-
-  const mockActivities = [
-    {
-      type: 'approve',
-      user: 'Kepala Sekretariat',
-      action: 'menyetujui dokumen "Laporan Keuangan Triwulan IV 2024"',
-      document: 'Laporan Keuangan Triwulan IV 2024',
-      timestamp: '2025-01-31T01:30:00Z'
-    },
-    {
-      type: 'upload',
-      user: 'Ahmad Rizki',
-      action: 'mengupload dokumen baru "Proposal Kegiatan Bakti Sosial 2025"',
-      document: 'Proposal Kegiatan Bakti Sosial 2025',
-      timestamp: '2025-01-31T01:00:00Z'
-    },
-    {
-      type: 'review',
-      user: 'Tim Sekretariat',
-      action: 'memulai review dokumen "Surat Permohonan Kerjasama"',
-      document: 'Surat Permohonan Kerjasama dengan Universitas Indonesia',
-      timestamp: '2025-01-31T00:45:00Z'
-    },
-    {
-      type: 'reject',
-      user: 'Kepala Sekretariat',
-      action: 'menolak dokumen "Rancangan Anggaran Kegiatan Seminar"',
-      document: 'Rancangan Anggaran Kegiatan Seminar Nasional',
-      timestamp: '2025-01-30T23:20:00Z'
-    },
-    {
-      type: 'comment',
-      user: 'Maya Sari',
-      action: 'menambahkan komentar pada dokumen "Notulen Rapat Pengurus"',
-      document: 'Notulen Rapat Pengurus Bulanan Januari 2025',
-      timestamp: '2025-01-30T22:15:00Z'
-    }
-  ];
-
+  // Fetch documents
   useEffect(() => {
-    setDocuments(mockDocuments);
-    setFilteredDocuments(mockDocuments);
+    const fetchDocuments = async () => {
+      const { data, error } = await supabase
+        .from('document')
+        .select('*')
+        .order('submitted_date', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching documents:', error);
+      } else {
+        setDocuments(data);
+        setFilteredDocuments(data);
+      }
+    };
+
+    fetchDocuments();
   }, []);
 
+  // Fetch activities
+  useEffect(() => {
+    const fetchActivities = async () => {
+      const { data, error } = await supabase
+        .from('activity')
+        .select(`
+          id, type, action, user, timestamp,
+          document:document_id (id, title)
+        `)
+        .order('timestamp', { ascending: false })
+        .limit(10);
+
+      if (error) {
+        console.error('Error fetching activities:', error);
+      } else {
+        setActivities(data);
+      }
+    };
+
+    fetchActivities();
+  }, []);
+
+  // Fetch statistics
+  useEffect(() => {
+    const fetchStats = async () => {
+      const { count: totalDocuments } = await supabase
+        .from('document')
+        .select('*', { count: 'exact', head: true });
+
+      const { count: pendingDocuments } = await supabase
+        .from('document')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      const { count: approvedThisMonth } = await supabase
+        .from('document')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'approved');
+
+      setStatistics({
+        totalDocuments,
+        pendingDocuments,
+        approvedThisMonth,
+        averageProcessingTime: 0 // bisa dihitung lebih detail
+      });
+    };
+
+    fetchStats();
+  }, []);
+
+  // Apply filters
   useEffect(() => {
     let filtered = documents;
 
-    // Apply filters
     if (filters?.status !== 'all') {
       filtered = filtered?.filter(doc => doc?.status === filters?.status);
     }
@@ -171,30 +114,31 @@ const SecretariatDashboard = () => {
       filtered = filtered?.filter(doc => doc?.priority === filters?.priority);
     }
     if (filters?.search) {
-      filtered = filtered?.filter(doc => 
+      filtered = filtered?.filter(doc =>
         doc?.title?.toLowerCase()?.includes(filters?.search?.toLowerCase()) ||
         doc?.description?.toLowerCase()?.includes(filters?.search?.toLowerCase())
       );
     }
     if (filters?.submitter) {
-      filtered = filtered?.filter(doc => 
-        doc?.submittedBy?.toLowerCase()?.includes(filters?.submitter?.toLowerCase())
+      filtered = filtered?.filter(doc =>
+        doc?.submitted_by?.toLowerCase()?.includes(filters?.submitter?.toLowerCase())
       );
     }
     if (filters?.startDate) {
-      filtered = filtered?.filter(doc => 
-        new Date(doc.submittedDate) >= new Date(filters.startDate)
+      filtered = filtered?.filter(doc =>
+        new Date(doc.submitted_date) >= new Date(filters.startDate)
       );
     }
     if (filters?.endDate) {
-      filtered = filtered?.filter(doc => 
-        new Date(doc.submittedDate) <= new Date(filters.endDate)
+      filtered = filtered?.filter(doc =>
+        new Date(doc.submitted_date) <= new Date(filters.endDate)
       );
     }
 
     setFilteredDocuments(filtered);
   }, [filters, documents]);
 
+  // Handle filter changes
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -211,63 +155,99 @@ const SecretariatDashboard = () => {
     });
   };
 
-  const handleDocumentUpload = (uploadData) => {
-    const newDocument = {
-      id: documents?.length + 1,
-      title: uploadData?.title,
-      description: uploadData?.description,
-      type: uploadData?.type,
-      status: 'pending',
-      priority: uploadData?.priority,
-      submittedBy: 'Admin User',
-      submittedDate: new Date()?.toISOString(),
-      deadline: uploadData?.deadline,
-      reviewDate: null,
-      approvalDate: null,
-      finalizedDate: null,
-      finalizedBy: null
-    };
+  // Upload document
+  const handleDocumentUpload = async (uploadData) => {
+    const { data, error } = await supabase
+      .from('document')
+      .insert([{
+        title: uploadData.title,
+        description: uploadData.description,
+        type: uploadData.type,
+        status: 'pending',
+        priority: uploadData.priority,
+        submitted_by: 'Admin User',
+        submitted_date: new Date().toISOString(),
+        deadline: uploadData.deadline,
+        review_date: null,
+        approval_date: null,
+        finalized_date: null,
+        finalized_by: null
+      }])
+      .select()
+      .single();
 
-    setDocuments(prev => [newDocument, ...prev]);
-    setShowUploadModal(false);
+    if (error) {
+      console.error('Error uploading document:', error);
+    } else {
+      setDocuments(prev => [data, ...prev]);
+      setShowUploadModal(false);
+    }
+  };
+
+  // Approve document
+  const handleDocumentApprove = async (document) => {
+    const { data, error } = await supabase
+      .from('document')
+      .update({
+        status: 'approved',
+        approval_date: new Date().toISOString(),
+        finalized_date: new Date().toISOString(),
+        finalized_by: 'Admin User'
+      })
+      .eq('id', document.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error approving document:', error);
+    } else {
+      setDocuments(prev => prev.map(doc => doc.id === document.id ? data : doc));
+    }
+  };
+
+  // Reject document
+  const handleDocumentReject = async (document) => {
+    const { data, error } = await supabase
+      .from('document')
+      .update({
+        status: 'rejected',
+        approval_date: new Date().toISOString(),
+        finalized_date: new Date().toISOString(),
+        finalized_by: 'Admin User'
+      })
+      .eq('id', document.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error rejecting document:', error);
+    } else {
+      setDocuments(prev => prev.map(doc => doc.id === document.id ? data : doc));
+    }
+  };
+
+  // Download document from Storage
+  const handleDocumentDownload = async (document) => {
+    const { data, error } = await supabase
+      .storage
+      .from('document')
+      .download(document.file_path);
+
+    if (error) {
+      console.error('Error downloading file:', error);
+    } else {
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = document.title;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   };
 
   const handleDocumentView = (document) => {
     setSelectedDocument(document);
     setShowDocumentViewer(true);
-  };
-
-  const handleDocumentApprove = (document, comment) => {
-    setDocuments(prev => prev?.map(doc => 
-      doc?.id === document?.id 
-        ? { 
-            ...doc, 
-            status: 'approved',
-            approvalDate: new Date()?.toISOString(),
-            finalizedDate: new Date()?.toISOString(),
-            finalizedBy: 'Admin User'
-          }
-        : doc
-    ));
-  };
-
-  const handleDocumentReject = (document, comment) => {
-    setDocuments(prev => prev?.map(doc => 
-      doc?.id === document?.id 
-        ? { 
-            ...doc, 
-            status: 'rejected',
-            approvalDate: new Date()?.toISOString(),
-            finalizedDate: new Date()?.toISOString(),
-            finalizedBy: 'Admin User'
-          }
-        : doc
-    ));
-  };
-
-  const handleDocumentDownload = (document) => {
-    // Mock download functionality
-    alert(`Mengunduh dokumen: ${document?.title}`);
   };
 
   const handleWorkflowView = (document) => {
@@ -290,7 +270,7 @@ const SecretariatDashboard = () => {
                 Kelola dokumen organisasi dengan sistem persetujuan terintegrasi
               </p>
             </div>
-            
+
             <div className="flex items-center space-x-3">
               <div className="flex items-center bg-muted rounded-lg p-1">
                 <Button
@@ -306,7 +286,7 @@ const SecretariatDashboard = () => {
                   onClick={() => setViewMode('list')}
                 />
               </div>
-              
+
               <Button
                 variant="outline"
                 iconName="BarChart3"
@@ -314,7 +294,7 @@ const SecretariatDashboard = () => {
               >
                 Workflow
               </Button>
-              
+
               <Button
                 iconName="Plus"
                 onClick={() => setShowUploadModal(true)}
@@ -325,7 +305,7 @@ const SecretariatDashboard = () => {
           </div>
 
           {/* Statistics Cards */}
-          <StatisticsCards statistics={mockStatistics} />
+          <StatisticsCards statistics={statistics} />
 
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
             {/* Main Content */}
@@ -343,19 +323,21 @@ const SecretariatDashboard = () => {
                   <h2 className="text-xl font-semibold text-foreground">
                     Dokumen ({filteredDocuments?.length})
                   </h2>
-                  
+
                   <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                     <Icon name="Filter" size={16} />
                     <span>
-                      {filters?.status !== 'all' || filters?.type !== 'all' || filters?.priority !== 'all' || filters?.search || filters?.submitter ?'Filter aktif' :'Semua dokumen'
-                      }
+                      {filters?.status !== 'all' || filters?.type !== 'all' || filters?.priority !== 'all' || filters?.search || filters?.submitter
+                        ? 'Filter aktif'
+                        : 'Semua dokumen'}
                     </span>
                   </div>
                 </div>
 
                 {filteredDocuments?.length > 0 ? (
-                  <div className={viewMode === 'grid' ?'grid grid-cols-1 lg:grid-cols-2 gap-6' :'space-y-4'
-                  }>
+                  <div className={viewMode === 'grid'
+                    ? 'grid grid-cols-1 lg:grid-cols-2 gap-6'
+                    : 'space-y-4'}>
                     {filteredDocuments?.map((document) => (
                       <DocumentCard
                         key={document?.id}
@@ -390,7 +372,7 @@ const SecretariatDashboard = () => {
 
             {/* Sidebar */}
             <div className="xl:col-span-1">
-              <RecentActivity activities={mockActivities} />
+              <RecentActivity activities={activities} />
             </div>
           </div>
         </div>
@@ -417,7 +399,7 @@ const SecretariatDashboard = () => {
               />
             </div>
             <div className="p-6">
-              <WorkflowVisualization document={selectedDocument || mockDocuments?.[0]} />
+              <WorkflowVisualization document={selectedDocument || documents?.[0]} />
             </div>
           </div>
         </div>
