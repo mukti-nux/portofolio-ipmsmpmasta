@@ -60,6 +60,13 @@ const Login = () => {
         >
           {loading ? 'Loading...' : 'Login'}
         </button>
+        <button
+          type="button"
+          className="w-full text-sm text-center text-muted-foreground hover:underline"
+          onClick={() => (window.location.href = '/auth/register')}
+        >
+          Belum punya akun? Register
+        </button>
       </form>
     </div>
   );
