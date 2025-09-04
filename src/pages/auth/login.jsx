@@ -63,7 +63,7 @@ const Login = () => {
         <button
           type="button"
           className="w-full text-sm text-center text-muted-foreground hover:underline"
-          onClick={() => (window.location.href = '/auth/register')}
+          onClick={() => (window.location.href = '/register')} // arahkan ke halaman register
         >
           Belum punya akun? Register
         </button>
