@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../../../../lib/supabaseClient';
 import Icon from '../../../components/AppIcon';
 
-const RecentActivity = ({ activities }) => {
+const RecentActivity = () => {
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const getActivityIcon = (type) => {
     switch (type) {
       case 'upload': return 'Upload';
@@ -45,43 +49,67 @@ const RecentActivity = ({ activities }) => {
     });
   };
 
+  useEffect(() => {
+    const fetchActivities = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('activity')
+        .select('*')
+        .order('timestamp', { ascending: false }) // urutkan terbaru dulu
+        .limit(10); // batasi misal 10 aktivitas terbaru
+
+      if (error) {
+        console.error('Error fetching activities:', error.message);
+      } else {
+        setActivities(data || []);
+      }
+      setLoading(false);
+    };
+
+    fetchActivities();
+  }, []);
+
   return (
     <div className="bg-card border border-border rounded-lg p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-foreground">Aktivitas Terbaru</h3>
         <Icon name="Activity" size={20} className="text-muted-foreground" />
       </div>
-      <div className="space-y-4">
-        {activities?.map((activity, index) => (
-          <div key={index} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getActivityColor(activity?.type)}`}>
-              <Icon name={getActivityIcon(activity?.type)} size={16} />
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-1">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {activity?.user}
-                </p>
-                <span className="text-xs text-muted-foreground flex-shrink-0 ml-2">
-                  {formatTimeAgo(activity?.timestamp)}
-                </span>
+
+      {loading ? (
+        <div className="text-center py-8 text-muted-foreground">Memuat...</div>
+      ) : activities?.length > 0 ? (
+        <div className="space-y-4">
+          {activities.map((activity, index) => (
+            <div key={index} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getActivityColor(activity?.type)}`}>
+                <Icon name={getActivityIcon(activity?.type)} size={16} />
               </div>
               
-              <p className="text-sm text-muted-foreground mb-1">
-                {activity?.action}
-              </p>
-              
-              {activity?.document && (
-                <p className="text-xs text-muted-foreground truncate">
-                  Dokumen: {activity?.document}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-medium text-foreground truncate">
+                    {activity?.user}
+                  </p>
+                  <span className="text-xs text-muted-foreground flex-shrink-0 ml-2">
+                    {formatTimeAgo(activity?.timestamp)}
+                  </span>
+                </div>
+                
+                <p className="text-sm text-muted-foreground mb-1">
+                  {activity?.action}
                 </p>
-              )}
+                
+                {activity?.document && (
+                  <p className="text-xs text-muted-foreground truncate">
+                    Dokumen: {activity?.document}
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-      {activities?.length === 0 && (
+          ))}
+        </div>
+      ) : (
         <div className="text-center py-8">
           <Icon name="Activity" size={48} className="mx-auto mb-4 text-muted-foreground" />
           <p className="text-muted-foreground">Belum ada aktivitas terbaru</p>
