@@ -32,16 +32,16 @@ const RecentActivity = () => {
     const now = new Date();
     const date = new Date(dateString);
     const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-    
+
     if (diffInMinutes < 1) return 'Baru saja';
     if (diffInMinutes < 60) return `${diffInMinutes} menit yang lalu`;
-    
+
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) return `${diffInHours} jam yang lalu`;
-    
+
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 7) return `${diffInDays} hari yang lalu`;
-    
+
     return date?.toLocaleDateString('id-ID', {
       day: '2-digit',
       month: 'short',
@@ -85,7 +85,7 @@ const RecentActivity = () => {
               <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getActivityColor(activity?.type)}`}>
                 <Icon name={getActivityIcon(activity?.type)} size={16} />
               </div>
-              
+
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-sm font-medium text-foreground truncate">
@@ -95,11 +95,11 @@ const RecentActivity = () => {
                     {formatTimeAgo(activity?.timestamp)}
                   </span>
                 </div>
-                
+
                 <p className="text-sm text-muted-foreground mb-1">
                   {activity?.action}
                 </p>
-                
+
                 {activity?.document && (
                   <p className="text-xs text-muted-foreground truncate">
                     Dokumen: {activity?.document}
