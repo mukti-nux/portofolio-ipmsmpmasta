@@ -31,16 +31,17 @@ const DocumentCard = ({ document, onView, onApprove, onReject, onDownload }) => 
   };
 
   return (
-    <div className="bg-card border border-border rounded-lg p-6 hover:shadow-brand transition-all duration-200">
+    <div className="bg-card border border-border rounded-lg p-4 sm:p-6 hover:shadow-brand transition-all duration-200">
+      {/* Header dengan status dan priority */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
           <h3 className="text-lg font-semibold text-foreground mb-2 truncate">
             {document?.title}
           </h3>
-          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-muted-foreground">
             <div className="flex items-center space-x-1">
               <Icon name="User" size={16} />
-              <span>{document?.submittedBy}</span>
+              <span className="truncate max-w-[120px] sm:max-w-none">{document?.submittedBy}</span>
             </div>
             <div className="flex items-center space-x-1">
               <Icon name="Calendar" size={16} />
@@ -48,12 +49,12 @@ const DocumentCard = ({ document, onView, onApprove, onReject, onDownload }) => 
             </div>
             <div className="flex items-center space-x-1">
               <Icon name="FileText" size={16} />
-              <span>{document?.type}</span>
+              <span className="hidden sm:inline">{document?.type}</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center space-x-2 ml-4">
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(document?.status)}`}>
+        <div className="flex flex-col sm:flex-row items-end sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 ml-2 sm:ml-4">
+          <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getStatusColor(document?.status)}`}>
             {document?.status === 'pending' ? 'Menunggu' : 
              document?.status === 'approved' ? 'Disetujui' : 
              document?.status === 'rejected' ? 'Ditolak' : 
@@ -66,53 +67,69 @@ const DocumentCard = ({ document, onView, onApprove, onReject, onDownload }) => 
           />
         </div>
       </div>
+
+      {/* Deskripsi */}
       <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
         {document?.description}
       </p>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <Icon name="Clock" size={16} />
-          <span>Deadline: {formatDate(document?.deadline)}</span>
-        </div>
-        
-        <div className="flex items-center space-x-2">
+
+      {/* Deadline */}
+      <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
+        <Icon name="Clock" size={16} />
+        <span>Deadline: {formatDate(document?.deadline)}</span>
+      </div>
+      
+      {/* Tombol-tombol - Responsif */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        {/* Tombol aksi utama */}
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="ghost"
             size="sm"
             iconName="Eye"
             onClick={() => onView(document)}
+            className="flex-1 sm:flex-none"
           >
-            Lihat
+            <span className="hidden sm:inline">Lihat</span>
+            <span className="sm:hidden">View</span>
           </Button>
           <Button
             variant="ghost"
             size="sm"
             iconName="Download"
             onClick={() => onDownload(document)}
+            className="flex-1 sm:flex-none"
           >
-            Unduh
+            <span className="hidden sm:inline">Unduh</span>
+            <span className="sm:hidden">Download</span>
           </Button>
-          {document?.status === 'pending' && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                iconName="Check"
-                onClick={() => onApprove(document)}
-              >
-                Setujui
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                iconName="X"
-                onClick={() => onReject(document)}
-              >
-                Tolak
-              </Button>
-            </>
-          )}
         </div>
+
+        {/* Tombol approve/reject - hanya untuk status pending */}
+        {document?.status === 'pending' && (
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              iconName="Check"
+              onClick={() => onApprove(document)}
+              className="flex-1 sm:flex-none"
+            >
+              <span className="hidden sm:inline">Setujui</span>
+              <span className="sm:hidden">✓</span>
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              iconName="X"
+              onClick={() => onReject(document)}
+              className="flex-1 sm:flex-none"
+            >
+              <span className="hidden sm:inline">Tolak</span>
+              <span className="sm:hidden">✗</span>
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
