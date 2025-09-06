@@ -14,7 +14,7 @@ import DocumentViewer from "./components/DocumentViewer";
 const SecretariatDashboard = () => {
   const [documents, setDocuments] = useState([]);
   const [filteredDocuments, setFilteredDocuments] = useState([]);
-  const [activities, setActivities] = useState([]);
+  // 🔹 Hapus state activities karena RecentActivity handle sendiri
   const [statistics, setStatistics] = useState({
     totalDocuments: 0,
     pendingDocuments: 0,
@@ -64,20 +64,7 @@ const SecretariatDashboard = () => {
     }
   };
 
-  // 🔹 Fetch aktivitas
-  const fetchActivities = async () => {
-    const { data, error } = await supabase
-      .from("activity")
-      .select("*, document(title)")
-      .order("timestamp", { ascending: false })
-      .limit(10);
-
-    if (error) {
-      console.error("Error fetching activities:", error);
-    } else {
-      setActivities(data);
-    }
-  };
+  // 🔹 Hapus fetchActivities() karena RecentActivity handle sendiri
 
   // 🔹 Fetch statistik
   const fetchStatistics = async () => {
@@ -132,69 +119,11 @@ const SecretariatDashboard = () => {
   // 🔹 Jalankan fetch saat load
   useEffect(() => {
     fetchDocuments();
-    fetchActivities();
+    // 🔹 Hapus fetchActivities() dari sini
     fetchStatistics();
   }, []);
 
-  // 🔹 Filtering dokumen
-  useEffect(() => {
-    let filtered = documents;
-
-    if (filters.status !== "all") {
-      filtered = filtered.filter((doc) => doc?.status === filters.status);
-    }
-    if (filters.type !== "all") {
-      filtered = filtered.filter((doc) => doc?.type === filters.type);
-    }
-    if (filters.priority !== "all") {
-      filtered = filtered.filter((doc) => doc?.priority === filters.priority);
-    }
-    if (filters.search) {
-      filtered = filtered.filter(
-        (doc) =>
-          doc?.title?.toLowerCase().includes(filters.search.toLowerCase()) ||
-          doc?.description
-            ?.toLowerCase()
-            .includes(filters.search.toLowerCase())
-      );
-    }
-    if (filters.submitter) {
-      filtered = filtered.filter((doc) =>
-        doc?.submittedBy
-          ?.toLowerCase()
-          .includes(filters.submitter.toLowerCase())
-      );
-    }
-    if (filters.startDate) {
-      filtered = filtered.filter(
-        (doc) => new Date(doc.submittedDate) >= new Date(filters.startDate)
-      );
-    }
-    if (filters.endDate) {
-      filtered = filtered.filter(
-        (doc) => new Date(doc.submittedDate) <= new Date(filters.endDate)
-      );
-    }
-
-    setFilteredDocuments(filtered);
-  }, [filters, documents]);
-
-  // 🔹 Event handler
-  const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const handleResetFilters = () => {
-    setFilters({
-      status: "all",
-      type: "all",
-      priority: "all",
-      search: "",
-      startDate: "",
-      endDate: "",
-      submitter: "",
-    });
-  };
+  // ... existing code ...
 
   const handleDocumentUpload = async (uploadData) => {
     const { error } = await supabase.from("document").insert([
@@ -214,16 +143,13 @@ const SecretariatDashboard = () => {
       console.error("Upload error:", error);
     } else {
       fetchDocuments();
-      fetchActivities();
+      // 🔹 RecentActivity akan auto-refresh sendiri
       fetchStatistics();
       setShowUploadModal(false);
     }
   };
 
-  const handleDocumentView = (document) => {
-    setSelectedDocument(document);
-    setShowDocumentViewer(true);
-  };
+  // ... existing code ...
 
   const handleDocumentApprove = async (document) => {
     await supabase
@@ -237,7 +163,7 @@ const SecretariatDashboard = () => {
       .eq("id", document.id);
 
     fetchDocuments();
-    fetchActivities();
+    // 🔹 RecentActivity akan auto-refresh sendiri
     fetchStatistics();
   };
 
@@ -253,14 +179,11 @@ const SecretariatDashboard = () => {
       .eq("id", document.id);
 
     fetchDocuments();
-    fetchActivities();
+    // 🔹 RecentActivity akan auto-refresh sendiri
     fetchStatistics();
   };
 
-  const handleDocumentDownload = (document) => {
-    // TODO: ambil file dari Supabase Storage
-    alert(`Mengunduh dokumen: ${document?.title}`);
-  };
+  // ... existing code ...
 
   return (
     <div className="min-h-screen bg-background">
@@ -388,7 +311,8 @@ const SecretariatDashboard = () => {
 
             {/* Sidebar */}
             <div className="xl:col-span-1">
-              <RecentActivity activities={activities} />
+              {/* 🔹 RecentActivity akan handle data fetching sendiri */}
+              <RecentActivity />
             </div>
           </div>
         </div>
