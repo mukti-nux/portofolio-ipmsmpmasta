@@ -6,24 +6,22 @@ const RecentActivity = () => {
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const getActivityIcon = (type) => {
-    switch (type) {
-      case 'upload': return 'Upload';
-      case 'approve': return 'Check';
-      case 'reject': return 'X';
+  const getActivityIcon = (status) => {
+    switch (status) {
+      case 'pending': return 'Clock';
+      case 'approved': return 'Check';
+      case 'rejected': return 'X';
       case 'review': return 'Eye';
-      case 'comment': return 'MessageSquare';
       default: return 'Activity';
     }
   };
 
-  const getActivityColor = (type) => {
-    switch (type) {
-      case 'upload': return 'text-primary bg-primary/10';
-      case 'approve': return 'text-success bg-success/10';
-      case 'reject': return 'text-destructive bg-destructive/10';
-      case 'review': return 'text-warning bg-warning/10';
-      case 'comment': return 'text-secondary bg-secondary/10';
+  const getActivityColor = (status) => {
+    switch (status) {
+      case 'pending': return 'text-warning bg-warning/10';
+      case 'approved': return 'text-success bg-success/10';
+      case 'rejected': return 'text-destructive bg-destructive/10';
+      case 'review': return 'text-primary bg-primary/10';
       default: return 'text-muted-foreground bg-muted';
     }
   };
@@ -52,16 +50,48 @@ const RecentActivity = () => {
   useEffect(() => {
     const fetchActivities = async () => {
       setLoading(true);
+      
+      // Ambil dokumen terbaru dan buat aktivitas dari perubahan status
       const { data, error } = await supabase
-        .from('activity')
+        .from('document')
         .select('*')
-        .order('timestamp', { ascending: false }) // urutkan terbaru dulu
-        .limit(10); // batasi misal 10 aktivitas terbaru
+        .order('submitted_date', { ascending: false })
+        .limit(10);
 
       if (error) {
         console.error('Error fetching activities:', error.message);
       } else {
-        setActivities(data || []);
+        // Transform dokumen menjadi aktivitas
+        const activities = data?.map(doc => {
+          let action = '';
+          let timestamp = doc.submitted_date;
+          let user = doc.submitted_by;
+
+          if (doc.status === 'approved' && doc.approval_date) {
+            action = `Menyetujui dokumen "${doc.title}"`;
+            timestamp = doc.approval_date;
+            user = doc.finalized_by || doc.submitted_by;
+          } else if (doc.status === 'rejected' && doc.approval_date) {
+            action = `Menolak dokumen "${doc.title}"`;
+            timestamp = doc.approval_date;
+            user = doc.finalized_by || doc.submitted_by;
+          } else if (doc.status === 'pending') {
+            action = `Mengupload dokumen "${doc.title}"`;
+            timestamp = doc.submitted_date;
+            user = doc.submitted_by;
+          }
+
+          return {
+            id: doc.id,
+            type: doc.status,
+            user: user,
+            action: action,
+            document: doc.title,
+            timestamp: timestamp
+          };
+        }) || [];
+
+        setActivities(activities);
       }
       setLoading(false);
     };
@@ -81,7 +111,7 @@ const RecentActivity = () => {
       ) : activities?.length > 0 ? (
         <div className="space-y-4">
           {activities.map((activity, index) => (
-            <div key={index} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+            <div key={activity.id || index} className="flex items-start space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getActivityColor(activity?.type)}`}>
                 <Icon name={getActivityIcon(activity?.type)} size={16} />
               </div>
