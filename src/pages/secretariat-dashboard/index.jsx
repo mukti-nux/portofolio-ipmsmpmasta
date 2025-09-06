@@ -267,43 +267,55 @@ const SecretariatDashboard = () => {
       <Header />
       <div className="pt-16">
         <div className="container-brand py-8">
-          {/* Page Header */}
-          <div className="flex items-center justify-between mb-8">
+          {/* Page Header - Compact Version */}
+          <div className="flex flex-col gap-4 mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
                 Dashboard Sekretariat
               </h1>
-              <p className="text-muted-foreground">
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Kelola dokumen organisasi dengan sistem persetujuan terintegrasi
               </p>
             </div>
 
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center bg-muted rounded-lg p-1">
+            {/* Tombol-tombol - Grid Layout */}
+            <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3">
+              {/* View Mode */}
+              <div className="flex bg-muted rounded-lg p-1">
                 <Button
                   variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
                   iconName="Grid3X3"
                   onClick={() => setViewMode("grid")}
+                  className="flex-1"
                 />
                 <Button
                   variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
                   iconName="List"
                   onClick={() => setViewMode("list")}
+                  className="flex-1"
                 />
               </div>
 
+              {/* Action Buttons */}
               <Button
                 variant="outline"
+                size="sm"
                 iconName="BarChart3"
                 onClick={() => setShowWorkflowModal(true)}
+                className="flex-1 sm:flex-none"
               >
-                Workflow
+                <span className="hidden sm:inline">Workflow</span>
               </Button>
 
-              <Button iconName="Plus" onClick={() => setShowUploadModal(true)}>
-                Upload Dokumen
+              <Button 
+                size="sm"
+                iconName="Plus" 
+                onClick={() => setShowUploadModal(true)}
+                className="flex-1 sm:flex-none"
+              >
+                <span className="hidden sm:inline">Upload</span>
               </Button>
             </div>
           </div>
